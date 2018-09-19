@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs-extra');
 const config = require('./config');
 
 (async () => {
@@ -15,12 +16,12 @@ const config = require('./config');
     await page.setViewport({width: 1920, height: 1080});
     await page.goto('https://www.suning.com/', {waitUntil: 'domcontentloaded'});
 
-    //前往登录
+    console.log('前往登录');
     let navigationPromise = page.waitForNavigation({waitUntil: 'domcontentloaded'});
     await page.click('a[name="public0_none_denglu_denglu"]');
     await navigationPromise; // The navigationPromise resolves after navigation has finished
 
-    //前往qq登录
+    console.log('前往qq登录');
     navigationPromise = page.waitForNavigation({waitUntil: 'networkidle2'});
     await page.click('a.qq');
     await navigationPromise; // The navigationPromise resolves after navigation has finished
@@ -31,14 +32,14 @@ const config = require('./config');
     });
     // console.dir(iframe);
 
-    //获取qq账号密码页面
+    console.log('获取qq账号密码页面');
     const switcher_plogin = await iframe.$('#switcher_plogin');
     // console.dir(switcher_plogin);
     await switcher_plogin.click();
     await iframe.type('#u', config.qq.username);
     await iframe.type('#p', config.qq.password);
 
-    //点击qq登录
+    console.log('点击qq登录');
     navigationPromise = page.waitForNavigation({waitUntil: 'domcontentloaded'});
     await iframe.click('#login_button');
     await navigationPromise; // The navigationPromise resolves after navigation has finished
@@ -48,11 +49,13 @@ const config = require('./config');
     // await page.click('.yunzuan');
     // await navigationPromise; // The navigationPromise resolves after navigation has finished
 
-    //去签到页面
-    await page.goto('https://sign.suning.com/sign-web/sign/welcome.do', {waitUntil: 'networkidle2'});
+    console.log('去签到页面');
+    await page.goto('https://sign.suning.com/sign-web/sign/welcome.do', {waitUntil: 'networkidle0'});
 
-    //点击打卡
-    await page.click('div.lotterydraw-start' +
-        '');
+    console.log('点击打卡');
+    await page.click('div.lotterydraw-start');
 
+    fs.ensureDirSync('suning');
+    await page.screenshot({path: `suning/${new Date().toLocaleString()}.png`});
+    await browser.close();
 })();

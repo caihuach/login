@@ -1,9 +1,10 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs-extra');
 const config = require('./config');
 
 (async () => {
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         args: ['--disable-notifications', '--start-maximized'],
     });
 
@@ -19,7 +20,7 @@ const config = require('./config');
     await page.click('.link-login');
     await navigationPromise; // The navigationPromise resolves after navigation has finished
 
-    //前往qq登录
+    console.log('前往qq登录');
     navigationPromise = page.waitForNavigation({waitUntil: 'networkidle2'});
     await page.click('a.pdl');
     await navigationPromise; // The navigationPromise resolves after navigation has finished
@@ -30,19 +31,22 @@ const config = require('./config');
     });
     // console.dir(iframe);
 
-    //获取qq账号密码页面
+    console.log('获取qq账号密码页面');
     const switcher_plogin = await iframe.$('#switcher_plogin');
     // console.dir(switcher_plogin);
     await switcher_plogin.click();
     await iframe.type('#u', config.qq.username);
     await iframe.type('#p', config.qq.password);
 
-    //点击qq登录
+    console.log('点击qq登录');
     navigationPromise = page.waitForNavigation({waitUntil: 'domcontentloaded'});
     await iframe.click('#login_button');
     await navigationPromise; // The navigationPromise resolves after navigation has finished
 
-    //去签到页面
-    await page.goto('https://vip.jd.com/sign/index');
+    console.log('去签到页面');
+    await page.goto('https://vip.jd.com/sign/index', {waitUntil: 'networkidle0'});
 
+    fs.ensureDirSync('jd');
+    await page.screenshot({path: `jd/${new Date().toLocaleString()}.png`});
+    await browser.close();
 })();
