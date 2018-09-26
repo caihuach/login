@@ -16,6 +16,9 @@ const config = require('./config');
     await page.setViewport({width: 1920, height: 1080});
     await page.goto('https://www.suning.com/', {waitUntil: 'domcontentloaded'});
 
+    /*
+    * todo:超时刷新
+    * */
     console.log('前往登录');
     let navigationPromise = page.waitForNavigation({waitUntil: 'domcontentloaded'});
     await page.click('a[name="public0_none_denglu_denglu"]');
@@ -50,7 +53,7 @@ const config = require('./config');
     // await navigationPromise; // The navigationPromise resolves after navigation has finished
 
     console.log('去签到页面');
-    await page.goto('https://sign.suning.com/sign-web/sign/welcome.do', {waitUntil: 'networkidle0'});
+    await page.goto('https://sign.suning.com/sign-web/sign/welcome.do', {waitUntil: 'domcontentloaded'});
 
     console.log('点击打卡');
     await page.click('div.lotterydraw-start');
